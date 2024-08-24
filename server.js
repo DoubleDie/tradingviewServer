@@ -1,8 +1,8 @@
 var http = require('http');
 
-const PORT = process.env.PORT || 8080;
-console.log("Server listening on port: ", PORT)
-http.createServer( (req, res) => {
+
+
+const server = http.createServer( (req, res) => {
     const headers = {
         "Content-Type": "application/json",
     };
@@ -30,4 +30,10 @@ http.createServer( (req, res) => {
             }
         })
     }
-}).listen(PORT)
+});
+
+server.listen(0, () => {
+    const PORT = server.address().port;
+    console.log("Server listening on port: ", PORT);
+});
+
