@@ -1,6 +1,7 @@
 var http = require('http');
 
 const PORT = process.env.PORT || 8080;
+console.log("Server listening on port: ", PORT)
 http.createServer( (req, res) => {
     const headers = {
         "Content-Type": "application/json",
