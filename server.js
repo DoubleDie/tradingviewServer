@@ -13,6 +13,9 @@ const server = http.createServer( (req, res) => {
         });
         req.on('end', () => {
             console.log(`Raw Body: ${body}`)
+            fs.writeFile('last_signal.txt', body, (err) => {
+                console.log("Error: ", err)
+            })
             try {
                 parsed = JSON.parse(body)
                 console.log("Parsed: ", parsed)
