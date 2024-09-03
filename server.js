@@ -19,7 +19,8 @@ const server = http.createServer( (req, res) => {
                     console.log("Error: ", err)
                 })
             }
-        res.end(200)       
+        res.writeHead(200);
+        res.end();       
         })
     }
 });
