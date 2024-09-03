@@ -18,7 +18,8 @@ const server = http.createServer( (req, res) => {
                 fs.writeFile('last_signal.txt', body, (err) => {
                     console.log("Error: ", err)
                 })
-            }         
+            }
+        res.end(200)       
         })
     }
 });
