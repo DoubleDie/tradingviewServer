@@ -10,9 +10,6 @@ import traceback
 rob_api_key = '1ypglMwj1gKSmvhsmE'
 rob_secret = 'Edlls60jK9yM7DgUmCwvy0lVPQ4YgOnDk43g'
 
-holger_api_key = 'VJMonsFJcJJ0k0kshQ'
-holger_secret = 'h6TbfrvvAMgOImJSjiBZqfmRpfsc9ONW6BbE'
-
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
 	datastream = open("last_signal.txt", 'r', encoding='utf8') 
@@ -35,7 +32,7 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 				content = chatlog
 				data_dict = json.loads(chatlog)
 				print(data_dict)
-				connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.10, "Buy")
+				connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.10, data_dict["direction"])
 
 		except:
 			print(traceback.format_exc())
@@ -67,22 +64,18 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		
 
 		#get price diff
-		price_diff = abs(float(params["buyPrice"]) - currentPrice)
-		if currentPrice > float(params["buyPrice"]):
-			params["stopLoss"] = str(float(params["stopLoss"]) + price_diff)
-			params["takeProfit1"] = str(float(params["takeProfit1"]) + price_diff)
-			if params["takeProfit2"] != "":
-				params["takeProfit2"] = str(float(params["takeProfit2"]) + price_diff)
-			params["buyPrice"] = str(float(params["buyPrice"]) + price_diff)
+		price_diff = abs(float(params["price"]) - currentPrice)
+		if currentPrice > float(params["price"]):
+			params["stoploss"] = str(float(params["stopLoss"]) + price_diff)
+			params["profit"] = str(float(params["profit"]) + price_diff)
+			params["price"] = str(float(params["price"]) + price_diff)
 		else:
-			params["stopLoss"] = str(float(params["stopLoss"]) - price_diff)
-			params["takeProfit1"] = str(float(params["takeProfit1"]) - price_diff)
-			if params["takeProfit2"] != "":
-				params["takeProfit2"] = str(float(params["takeProfit2"]) - price_diff)
-			params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
+			params["stoploss"] = str(float(params["stoploss"]) - price_diff)
+			params["profit"] = str(float(params["profit"]) - price_diff)
+			params["price"] = str(float(params["price"]) - price_diff)
 
 		#calculate risk
-		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
+		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stoploss"]) - float(params["price"])))) * float(params["price"])
 		print(f"Purchase amount: {fiatQuantity}")
 
 		buffer = fiatQuantity * 0.02
@@ -94,9 +87,9 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 			leverage = math.ceil((fiatQuantity + buffer)/float(available))
 
 		#calculating qantity
-		inst_info = bybitAPI.get_instruments_info(category='linear', symbol=params["Coin"])
+		inst_info = bybitAPI.get_instruments_info(category='linear', symbol="BTCUSDT")
 		minOrderQty = inst_info['result']['list'][0]['lotSizeFilter']['minOrderQty']
-		orderQty = float(fiatQuantity) / float(params["buyPrice"])
+		orderQty = float(fiatQuantity) / float(params["price"])
 		if "." in str(minOrderQty):
 			roundTo = len(str(minOrderQty).split(".")[1])
 			orderQty = round(orderQty, roundTo)
@@ -109,27 +102,28 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 			if leverage < float(maxlever):
 				print("Leverage: pass")
 				#rounding all price figures to the instruments native figures
-				if '.' in str(params["buyPrice"]):
-					roundTo = len(str(params["buyPrice"]).split('.')[1])
+				if '.' in str(params["price"]):
+					roundTo = len(str(params["price"]).split('.')[1])
 					
 				else:
 					roundTo = 0
 
 				#setting leverage
 				try:
-					bybitAPI.set_leverage(category='linear', symbol=params["Coin"], buyLeverage=str(leverage), sellLeverage=str(leverage))
+					bybitAPI.set_leverage(category='linear', symbol="BTCUSDT", buyLeverage=str(leverage), sellLeverage=str(leverage))
 				except:
 					x = 1
-				trailing = str(round(abs(float(params["buyPrice"]) - float(params["takeProfit1"])), roundTo))
+				trailing = str(round(abs(float(params["price"]) - float(params["profit"])), roundTo))
 				
 				#placing trade
+				direction = direction.capitalize()
 				init_order = bybitAPI.place_order(
 					category='linear',
-					symbol=params["Coin"],
+					symbol="BTCUSDT",
 					side=direction,
 					orderType='Limit',
 					qty=str(orderQty),
-					price=params["buyPrice"]
+					price=params["price"]
 					)
 				orderId = init_order["result"]["orderId"]
 				print(init_order)
@@ -137,38 +131,25 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 				timer = 0
 				while new_position == "0" and timer < 60:
 					time.sleep(0.5)
-					new_position = bybitAPI.get_positions(category='linear', symbol=params["Coin"])['result']['list'][0]["avgPrice"]
+					new_position = bybitAPI.get_positions(category='linear', symbol="BTCUSDT")['result']['list'][0]["avgPrice"]
 					timer += 1
 					if timer == 30:
 						print(f"Trying for {timer} more seconds.")
 				if timer >= 60:
 					print("Trade aborted: Position not filled in time.")
-					bybitAPI.cancel_order(category="linear", symbol=params["Coin"], orderId=orderId)
+					bybitAPI.cancel_order(category="linear", symbol="BTCUSDT", orderId=orderId)
 				else:
-					if params["takeProfit2"] != "":
-						stop_order = bybitAPI.set_trading_stop(
-							category='linear',
-							symbol=params["Coin"],
-							takeProfit=params["takeProfit2"],
-							stopLoss=params["stopLoss"],
-							tpslMode='Full',
-							tpOrderType='Market',
-							slOrderType='Market',
-							trailingStop=trailing,
-							activePrice=params["takeProfit1"],
-							positionIdx=0
-							)
-					else:
-						stop_order = bybitAPI.set_trading_stop(
-							category='linear',
-							symbol=params["Coin"],
-							takeProfit=params["takeProfit1"],
-							stopLoss=params["stopLoss"],
-							tpslMode='Full',
-							tpOrderType='Market',
-							slOrderType='Market',
-							positionIdx=0
-							)
+					stop_order = bybitAPI.set_trading_stop(
+						category='linear',
+						symbol="BTCUSDT",
+						stopLoss=params["stoploss"],
+						tpslMode='Full',
+						tpOrderType='Market',
+						slOrderType='Market',
+						trailingStop=trailing,
+						activePrice=params["profit"],
+						positionIdx=0
+						)
 	else:
 		print("Too many positions open.")
 
