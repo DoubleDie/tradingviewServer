@@ -7,8 +7,8 @@ import json
 import traceback
 
 #load api keys
-rob_api_key = '1ypglMwj1gKSmvhsmE'
-rob_secret = 'Edlls60jK9yM7DgUmCwvy0lVPQ4YgOnDk43g'
+rob_api_key = 'HS0mAS2lCCvc5YGhBx'
+rob_secret = 'cb34UD2zInoIybZB8UeBEWoTErFdBtHt5eKl'
 
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
@@ -55,11 +55,12 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 	#get account balance
 		balance = bybitAPI.get_wallet_balance(accountType='UNIFIED', coin='USDT')
 		available = balance['result']['list'][0]['coin'][0]['availableToWithdraw']
+		print("Available Balance: ", available)
 		in_positions = balance['result']['list'][0]['coin'][0]['totalPositionIM']
 		totalBalance = float(available) + float(in_positions)
 
 		#get coin price
-		ticker = bybitAPI.get_tickers(category='linear', symbol=params["Coin"])
+		ticker = bybitAPI.get_tickers(category='linear', symbol="BTCUSDT")
 		currentPrice = float(ticker['result']['list'][0]['lastPrice'])
 		
 
