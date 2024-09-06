@@ -140,7 +140,19 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol="BTCUSDT", orderId=orderId)
 				else:
-					stop_order = bybitAPI.set_trading_stop(
+					profit_order = bybitAPI.set_trading_stop(
+						category='linear',
+						symbol="BTCUSDT",
+						takeProfit=params["profit"],
+						tpslMode="Partial",
+						tpSize=str(orderQty/2),
+						slSize=str(orderQty/2),
+						tpOrderType="Market",
+						slOrderType="Market",
+						positionIdx=0
+					)
+
+					trailing_stop_order = bybitAPI.set_trading_stop(
 						category='linear',
 						symbol="BTCUSDT",
 						stopLoss=params["stoploss"],
