@@ -14,7 +14,7 @@ trailing = ""
 target = ""
 
 def trailingStops():
-	print("Checking trailing stop positions")
+	#print("Checking trailing stop positions")
 	bybitAPI = HTTP(
 		testnet = False,
 		api_key = rob_api_key,
