@@ -23,14 +23,14 @@ def trailingStops():
 	positions = bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list']
 	positionsOpen = len(positions)
 	if positionsOpen == 1:
-		print("Open Position found. Getting timestamp:")
+		#print("Open Position found. Getting timestamp:")
 		time = bybitAPI.get_server_time()["result"]["timeSecond"]
-		print("Timestamp: ", time)
+		#print("Timestamp: ", time)
 		sixHours = 21600
 		hour = datetime.datetime.fromtimestamp(int(time)).strftime('%H')
 		minute = datetime.datetime.fromtimestamp(int(time)).strftime('%M')
-		print("Hour: ", hour)
-		print("Minute: ", minute)
+		#print("Hour: ", hour)
+		#print("Minute: ", minute)
 		utc_hour = int(hour) - 10
 		if (int(utc_hour) % 4) == 0 or utc_hour == 0:
 			if int(minute) == 0:
@@ -73,8 +73,6 @@ def trailingStops():
 								positionIdx=0
 								)
 						target = str(float(target) + float(trailing))
-			else:
-				print("Candle still open.")
 
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
