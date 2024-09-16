@@ -58,6 +58,7 @@ def trailingStops():
 								slOrderType='Market',
 								positionIdx=0
 								)
+						global target
 						target = str(float(target) - float(trailing))
 				elif side == "Buy":
 					print("Buy order detected, checking to move stop loss.")
@@ -72,6 +73,7 @@ def trailingStops():
 								slOrderType='Market',
 								positionIdx=0
 								)
+						global target
 						target = str(float(target) + float(trailing))
 
 
@@ -207,6 +209,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol="BTCUSDT", orderId=orderId)
 				else:
+					global target
 					target = params["profit"]
 					profit_order = bybitAPI.set_trading_stop(
 						category='linear',
