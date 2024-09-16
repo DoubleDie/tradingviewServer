@@ -15,6 +15,7 @@ target = input("Enter custom target value: ")
 
 def trailingStops():
 	#print("Checking trailing stop positions")
+	global target
 	bybitAPI = HTTP(
 		testnet = False,
 		api_key = rob_api_key,
@@ -58,7 +59,6 @@ def trailingStops():
 								slOrderType='Market',
 								positionIdx=0
 								)
-						global target
 						target = str(float(target) - float(trailing))
 				elif side == "Buy":
 					print("Buy order detected, checking to move stop loss.")
@@ -73,7 +73,6 @@ def trailingStops():
 								slOrderType='Market',
 								positionIdx=0
 								)
-						global target
 						target = str(float(target) + float(trailing))
 
 
