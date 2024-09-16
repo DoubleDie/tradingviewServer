@@ -10,8 +10,8 @@ import traceback
 rob_api_key = 'HS0mAS2lCCvc5YGhBx'
 rob_secret = 'cb34UD2zInoIybZB8UeBEWoTErFdBtHt5eKl'
 
-trailing = ""
-target = ""
+trailing = input("Enter custom trailing value: ")
+target = input("Enter custom target value: ")
 
 def trailingStops():
 	#print("Checking trailing stop positions")
