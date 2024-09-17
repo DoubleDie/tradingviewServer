@@ -7,8 +7,13 @@ import json
 import traceback
 
 #load api keys
-rob_api_key = 'HS0mAS2lCCvc5YGhBx'
-rob_secret = 'cb34UD2zInoIybZB8UeBEWoTErFdBtHt5eKl'
+user = input("Enter keyfile: ")
+f = open("~/" + user, "r")
+keys = f.read()
+f.close()
+keys = json.load(keys)
+rob_api_key = keys["Key"]
+rob_secret = keys["Secret"]
 
 trailing = input("Enter custom trailing value: ")
 target = input("Enter custom target value: ")
