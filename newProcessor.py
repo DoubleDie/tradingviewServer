@@ -42,13 +42,13 @@ def trailingStops():
 			start=pastTime)
 		high = float(candles["result"]["list"][0][2])
 		low = float(candles["result"]["list"][0][3])
-		print("High: ", high)
-		print("Low: ", low)
+		#print("High: ", high)
+		#print("Low: ", low)
 		side = positions[0]["side"]
 		if side == "Sell":
-			print("Sell order detected, checking to move stop loss.")
+			#print("Sell order detected, checking to move stop loss.")
 			if low <= float(target):
-				print("Target reached, moving stoploss.")
+				print("Target of sell order reached, moving stoploss.")
 				trailing_stop_order = bybitAPI.set_trading_stop(
 						category='linear',
 						symbol="BTCUSDT",
@@ -60,9 +60,9 @@ def trailingStops():
 						)
 				target = str(float(target) - float(trailing))
 		elif side == "Buy":
-			print("Buy order detected, checking to move stop loss.")
+			#print("Buy order detected, checking to move stop loss.")
 			if high >= float(target):
-				print("Target reached, moving stoploss.")
+				print("Target of buy order reached, moving stoploss.")
 				trailing_stop_order = bybitAPI.set_trading_stop(
 					category='linear',
 					symbol="BTCUSDT",
