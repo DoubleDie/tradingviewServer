@@ -11,7 +11,7 @@ user = input("Enter keyfile: ")
 f = open("/root/" + user, "r")
 keys = f.read()
 f.close()
-keys = json.load(keys)
+keys = json.loads(keys)
 rob_api_key = keys["Key"]
 rob_secret = keys["Secret"]
 
