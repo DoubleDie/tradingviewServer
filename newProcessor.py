@@ -134,7 +134,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		#get price diff
 		price_diff = abs(float(params["price"]) - currentPrice)
 		if currentPrice > float(params["price"]):
-			params["stoploss"] = str(float(params["stopLoss"]) + price_diff)
+			params["stoploss"] = str(float(params["stoploss"]) + price_diff)
 			params["profit"] = str(float(params["profit"]) + price_diff)
 			params["price"] = str(float(params["price"]) + price_diff)
 		else:
