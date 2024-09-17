@@ -8,7 +8,7 @@ import traceback
 
 #load api keys
 user = input("Enter keyfile: ")
-f = open("/root/" + user, "r")
+f = open("/root/" + user, "r", encoding='utf8')
 keys = f.read()
 f.close()
 keys = json.loads(keys)
