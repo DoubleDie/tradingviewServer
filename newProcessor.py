@@ -10,11 +10,12 @@ import traceback
 rob_api_key = 'HS0mAS2lCCvc5YGhBx'
 rob_secret = 'cb34UD2zInoIybZB8UeBEWoTErFdBtHt5eKl'
 
-trailing = ""
-target = ""
+trailing = input("Enter custom trailing value: ")
+target = input("Enter custom target value: ")
 
 def trailingStops():
 	#print("Checking trailing stop positions")
+	global target
 	bybitAPI = HTTP(
 		testnet = False,
 		api_key = rob_api_key,
@@ -207,6 +208,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol="BTCUSDT", orderId=orderId)
 				else:
+					global target
 					target = params["profit"]
 					profit_order = bybitAPI.set_trading_stop(
 						category='linear',
