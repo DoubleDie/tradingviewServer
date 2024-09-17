@@ -33,47 +33,46 @@ def trailingStops():
 		#print("Hour: ", hour)
 		#print("Minute: ", minute)
 		utc_hour = int(hour) - 10
-		if (int(utc_hour) % 4) == 0 or utc_hour == 0:
-			if int(minute) == 0:
-				print("Candle just closed")
-				pastTime = int(time) - sixHours
-				pastTime = pastTime * 1000
-				candles = bybitAPI.get_kline(
-					category="linear",
+		pastTime = int(time) - sixHours
+		pastTime = pastTime * 1000
+		candles = bybitAPI.get_kline(
+			category="linear",
+			symbol="BTCUSDT",
+			interval=240,
+			start=pastTime)
+		high = float(candles["result"]["list"][0][2])
+		low = float(candles["result"]["list"][0][3])
+		print("High: ", high)
+		print("Low: ", low)
+		side = positions[0]["side"]
+		if side == "Sell":
+			print("Sell order detected, checking to move stop loss.")
+			if low <= float(target):
+				print("Target reached, moving stoploss.")
+				trailing_stop_order = bybitAPI.set_trading_stop(
+						category='linear',
+						symbol="BTCUSDT",
+						stopLoss=str(float(target) + float(trailing)),
+						tpslMode='Full',
+						tpOrderType='Market',
+						slOrderType='Market',
+						positionIdx=0
+						)
+				target = str(float(target) - float(trailing))
+		elif side == "Buy":
+			print("Buy order detected, checking to move stop loss.")
+			if high >= float(target):
+				print("Target reached, moving stoploss.")
+				trailing_stop_order = bybitAPI.set_trading_stop(
+					category='linear',
 					symbol="BTCUSDT",
-					interval=240,
-					start=pastTime)
-				high = float(candles["result"]["list"][-1][2])
-				low = float(candles["result"]["list"][-1][3])
-				side = positions[0]["side"]
-				if side == "Sell":
-					print("Sell order detected, checking to move stop loss.")
-					if low <= float(target):
-						print("Target reached, moving stoploss.")
-						trailing_stop_order = bybitAPI.set_trading_stop(
-								category='linear',
-								symbol="BTCUSDT",
-								stopLoss=str(float(target) + float(trailing)),
-								tpslMode='Full',
-								tpOrderType='Market',
-								slOrderType='Market',
-								positionIdx=0
-								)
-						target = str(float(target) - float(trailing))
-				elif side == "Buy":
-					print("Buy order detected, checking to move stop loss.")
-					if high >= float(target):
-						print("Target reached, moving stoploss.")
-						trailing_stop_order = bybitAPI.set_trading_stop(
-								category='linear',
-								symbol="BTCUSDT",
-								stopLoss=str(float(target) - float(trailing)),
-								tpslMode='Full',
-								tpOrderType='Market',
-								slOrderType='Market',
-								positionIdx=0
-								)
-						target = str(float(target) + float(trailing))
+					stopLoss=str(float(target) - float(trailing)),
+					tpslMode='Full',
+					tpOrderType='Market',
+					slOrderType='Market',
+					positionIdx=0
+					)
+				target = str(float(target) + float(trailing))
 
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
