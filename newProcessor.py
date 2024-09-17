@@ -59,6 +59,7 @@ def trailingStops():
 						positionIdx=0
 						)
 				target = str(float(target) - float(trailing))
+				print(f"New target: {target} with trailing distance: {trailing}")
 		elif side == "Buy":
 			#print("Buy order detected, checking to move stop loss.")
 			if high >= float(target):
@@ -73,6 +74,7 @@ def trailingStops():
 					positionIdx=0
 					)
 				target = str(float(target) + float(trailing))
+				print(f"New target: {target} with trailing distance: {trailing}")
 
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
