@@ -21,6 +21,7 @@ target = input("Enter custom target value: ")
 def trailingStops():
 	#print("Checking trailing stop positions")
 	global target
+	global trailing
 	bybitAPI = HTTP(
 		testnet = False,
 		api_key = rob_api_key,
@@ -120,6 +121,8 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		api_secret = secret_key)
 
 	abandon = False
+	global trailing
+	global target
 	print("Initiating trade process...")
 	#check for positions
 	positions = len(bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list'])
@@ -214,7 +217,6 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol="BTCUSDT", orderId=orderId)
 				else:
-					global target
 					target = params["profit"]
 					profit_order = bybitAPI.set_trading_stop(
 						category='linear',
