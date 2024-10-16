@@ -223,8 +223,8 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 						symbol="BTCUSDT",
 						takeProfit=params["profit"],
 						tpslMode="Partial",
-						tpSize=str(orderQty/2),
-						slSize=str(orderQty/2),
+						tpSize=str(orderQty/4),
+						slSize=str(orderQty/4),
 						tpOrderType="Market",
 						slOrderType="Market",
 						positionIdx=0
