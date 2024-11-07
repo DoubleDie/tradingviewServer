@@ -140,7 +140,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		ticker = bybitAPI.get_tickers(category='linear', symbol="BTCUSDT")
 		currentPrice = float(ticker['result']['list'][0]['lastPrice'])
 		
-
+		'''
 		#get price diff
 		price_diff = abs(float(params["price"]) - currentPrice)
 		if currentPrice > float(params["price"]):
@@ -151,7 +151,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 			params["stoploss"] = str(float(params["stoploss"]) - price_diff)
 			params["profit"] = str(float(params["profit"]) - price_diff)
 			params["price"] = str(float(params["price"]) - price_diff)
-
+		'''
 		#calculate risk
 		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stoploss"]) - float(params["price"])))) * float(params["price"])
 		print(f"Purchase amount: {fiatQuantity}")
@@ -159,14 +159,11 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		buffer = fiatQuantity * 0.02
 
 		#calculating required leverage
-		if positions == 0:
-			leverage = math.ceil((fiatQuantity + buffer)/(float(available)/2))
-		if positions == 1:
-			leverage = math.ceil((fiatQuantity + buffer)/float(available))
+		leverage = math.ceil((fiatQuantity + buffer)/(float(available)/2))
 
 		#calculating qantity
-		inst_info = bybitAPI.get_instruments_info(category='linear', symbol="BTCUSDT")
-		minOrderQty = inst_info['result']['list'][0]['lotSizeFilter']['minOrderQty']
+		#inst_info = bybitAPI.get_instruments_info(category='linear', symbol="BTCUSDT")
+		minOrderQty = 0.001
 		orderQty = float(fiatQuantity) / float(params["price"])
 		if "." in str(minOrderQty):
 			roundTo = len(str(minOrderQty).split(".")[1])
@@ -176,7 +173,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		if orderQty >= float(minOrderQty):	
 			print("Minimum order quantity: pass")
 			#checking maximum leverage is above used leverage
-			maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
+			maxlever = 100.00
 			if leverage < float(maxlever):
 				print("Leverage: pass")
 				#rounding all price figures to the instruments native figures
@@ -185,7 +182,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					
 				else:
 					roundTo = 0
-
+				
 				#setting leverage
 				try:
 					bybitAPI.set_leverage(category='linear', symbol="BTCUSDT", buyLeverage=str(leverage), sellLeverage=str(leverage))
